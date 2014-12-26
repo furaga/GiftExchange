@@ -1,14 +1,13 @@
 # 以下のページを参考に実装
 # https://davis.gfd-dennou.org/rubygadgets/ja/?(Tips)+PowerPoint+%A5%D5%A5%A1%A5%A4%A5%EB%A4%CE%BC%AB%C6%B0%C0%B8%C0%AE
-
 require 'win32ole'
-Encoding.default_external = 'UTF-8'
 
+Encoding.default_external = 'UTF-8'
 output = "GiftExchange.ppt"
 
 # 参加者の名前を読み込み
 f = open("nameList.txt")
-p names = f.read.split(/(\n|\r)/).select { |line| !line.match(/\s/) }
+names = f.read.split(/(\n|\r)/).select { |line| !line.match(/\s/) }
 randNames = names.sort_by {rand} # シャッフル
 f.close
 
@@ -19,13 +18,11 @@ end
 
 # PowerPoint アプリケーションを開く
 pp =  WIN32OLE.new('PowerPoint.Application')
-
 # 既にファイルを開いている場合は処理をしない
 if pp.Presentations.Count > 0 then
   puts "ERROR: Close all PowerPoint file and rerun this script."
   exit 1
 end
-
 # アプリケーションウィンドウを表示
 pp.Visible = true
 
@@ -63,18 +60,15 @@ def genNewSlide(presen, title, text)
 	return slideShape
 end
 
+# 1でサムネイルビューを隠す。9で通常表示
+pp.activewindow.viewtype = 1
+
 for i in 0...randNames.length
 	title = randNames[i] + "から"
 	text = randNames[(i + 1) % randNames.length] + "へ"
 	genNewSlide(presen, title, "")
 	genNewSlide(presen, title, text)
-	if i == 0 then
-		# 1でサムネイルビューを隠す。9で通常表示
-		pp.activewindow.viewtype = 1
-	end
 end
 
-if output then
-  output = getAbsolutePath(output)
-  presen.SaveAs(output)
-end
+output = getAbsolutePath(output)
+presen.SaveAs(output)
